@@ -1,89 +1,84 @@
-import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Chrome, Star } from "lucide-react";
+import { RetroGrid } from "@/components/blocks/hero-section-dark";
 
 export default function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-      {/* Background gradient */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        aria-hidden="true"
-      >
-        {/* Deep dark base */}
+      {/* Background */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div className="absolute inset-0 bg-[#0a0f1e]" />
-        {/* Radial glow center */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[700px] bg-blue-600/10 rounded-full blur-[120px]" />
-        {/* Ambient blob top-left */}
-        <div className="ambient-blob w-[500px] h-[500px] top-0 -left-32 bg-indigo-600/15" />
-        {/* Ambient blob bottom-right */}
-        <div className="ambient-blob w-[400px] h-[400px] -bottom-20 right-0 bg-violet-600/10" />
-        {/* Grid overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
-            backgroundSize: "64px 64px",
-          }}
-        />
+        {/* Radial blue glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_60%_80%_at_50%_0%,rgba(37,99,235,0.2),transparent)]" />
+        {/* Ambient blobs */}
+        <div className="ambient-blob w-[500px] h-[500px] top-0 -left-32 bg-indigo-600/10" />
+        <div className="ambient-blob w-[400px] h-[400px] -bottom-20 right-0 bg-violet-600/8" />
       </div>
 
+      {/* Retro grid */}
+      <RetroGrid
+        angle={65}
+        cellSize={64}
+        opacity={0.5}
+        lightLineColor="rgba(255,255,255,0.06)"
+        darkLineColor="rgba(255,255,255,0.06)"
+      />
+
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-24">
-        {/* Eyebrow badge */}
+        {/* Eyebrow pill */}
         <div className="flex justify-center mb-6">
-          <Badge
-            variant="outline"
-            className="px-4 py-1.5 text-xs font-semibold border-blue-500/30 bg-blue-500/10 text-blue-300 tracking-wide uppercase"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mr-2 inline-block animate-pulse" />
+          <p className="text-sm text-gray-400 group font-sans mx-auto px-5 py-2 bg-gradient-to-tr from-zinc-300/5 via-gray-400/5 to-transparent border-[2px] border-white/5 rounded-3xl w-fit">
             Chrome Extension — Now Available
-          </Badge>
+          </p>
         </div>
 
         {/* Headline */}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight mb-6 text-white">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tighter font-extrabold bg-clip-text text-transparent mx-auto bg-[linear-gradient(180deg,_#fff_0%,_rgba(255,255,255,0.75)_100%)] mb-4 leading-[1.1]">
           Supercharge Your{" "}
-          <span className="relative inline-block">
-            <span className="gradient-text">NotebookLM</span>
-            <span
-              className="absolute -bottom-1 left-0 right-0 h-[3px] rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 opacity-60"
-              aria-hidden="true"
-            />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">
+            NotebookLM
           </span>
           <br />
           Experience
         </h1>
 
-        {/* Subheadline */}
-        <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-          NoteHub adds powerful features to NotebookLM — export chats & sources,
+        {/* Description */}
+        <p className="max-w-2xl mx-auto text-gray-400 text-lg mb-10 leading-relaxed">
+          NoteHub adds powerful features to NotebookLM — export chats &amp; sources,
           save prompts, manage notebooks, and unify all your AI conversations in
           one intelligent dashboard.
         </p>
 
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
-          <a
-            href="#pricing"
-            className="inline-flex items-center justify-center w-full sm:w-auto h-12 px-8 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-base shadow-xl shadow-blue-600/30 hover:shadow-blue-500/40 transition-all duration-200 cursor-pointer group"
-          >
-            <Chrome className="w-5 h-5 mr-2" aria-hidden="true" />
-            Add to Chrome — It&apos;s Free
-            <ArrowRight
-              className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1"
-              aria-hidden="true"
-            />
-          </a>
+        <div className="items-center justify-center gap-x-4 space-y-3 sm:flex sm:space-y-0 mb-14">
+          {/* Primary CTA with animated spinning border */}
+          <span className="relative inline-block overflow-hidden rounded-full p-[1.5px]">
+            <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#93c5fd_0%,#2563eb_50%,#93c5fd_100%)]" />
+            <div className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-[#0a0f1e] backdrop-blur-3xl">
+              <a
+                href="#pricing"
+                className="inline-flex rounded-full text-center group items-center w-full justify-center bg-gradient-to-tr from-blue-300/10 via-blue-400/20 to-transparent text-white border-[1px] border-white/10 hover:border-white/20 transition-all sm:w-auto py-4 px-10 font-semibold"
+              >
+                <Chrome className="w-4 h-4 mr-2" aria-hidden="true" />
+                Add to Chrome — It&apos;s Free
+                <ArrowRight
+                  className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
+              </a>
+            </div>
+          </span>
+
+          {/* Secondary CTA */}
           <a
             href="#features"
-            className="inline-flex items-center justify-center w-full sm:w-auto h-12 px-8 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white font-semibold text-base transition-all duration-200 cursor-pointer"
+            className="inline-flex items-center justify-center h-12 px-8 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white font-semibold text-base transition-all duration-200"
           >
             See Features
           </a>
         </div>
 
         {/* Social proof */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-slate-500">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-slate-500 mb-20">
           <div className="flex items-center gap-1.5">
             <div className="flex" aria-label="5 star rating">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -107,7 +102,7 @@ export default function HeroSection() {
         </div>
 
         {/* Hero mockup card */}
-        <div className="mt-20 max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <div className="glass-card rounded-2xl overflow-hidden shadow-2xl shadow-black/40 border border-white/[0.07] hover-lift">
             {/* Browser chrome bar */}
             <div className="flex items-center gap-2 px-4 py-3 bg-white/[0.03] border-b border-white/[0.06]">
@@ -122,7 +117,9 @@ export default function HeroSection() {
                 </div>
               </div>
               <div className="w-20 h-5 rounded bg-blue-600/30 border border-blue-500/20 flex items-center justify-center">
-                <span className="text-[10px] text-blue-400 font-medium">NoteHub</span>
+                <span className="text-[10px] text-blue-400 font-medium">
+                  NoteHub
+                </span>
               </div>
             </div>
 
@@ -133,26 +130,29 @@ export default function HeroSection() {
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">
                   Notebooks
                 </p>
-                {["Research Project", "Meeting Notes", "Study Guide", "Side Project"].map(
-                  (name, i) => (
+                {[
+                  "Research Project",
+                  "Meeting Notes",
+                  "Study Guide",
+                  "Side Project",
+                ].map((name, i) => (
+                  <div
+                    key={name}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                      i === 0
+                        ? "bg-blue-600/20 text-blue-300 border border-blue-500/20"
+                        : "text-slate-400 hover:bg-white/5"
+                    }`}
+                  >
                     <div
-                      key={name}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
-                        i === 0
-                          ? "bg-blue-600/20 text-blue-300 border border-blue-500/20"
-                          : "text-slate-400 hover:bg-white/5"
+                      className={`w-2 h-2 rounded-full ${
+                        i === 0 ? "bg-blue-400" : "bg-slate-600"
                       }`}
-                    >
-                      <div
-                        className={`w-2 h-2 rounded-full ${
-                          i === 0 ? "bg-blue-400" : "bg-slate-600"
-                        }`}
-                        aria-hidden="true"
-                      />
-                      {name}
-                    </div>
-                  )
-                )}
+                      aria-hidden="true"
+                    />
+                    {name}
+                  </div>
+                ))}
               </div>
 
               {/* Main content */}
@@ -193,7 +193,9 @@ export default function HeroSection() {
                   <div className="glass rounded-xl p-4">
                     <p className="text-xs text-slate-500 mb-1">AI Chats</p>
                     <p className="text-2xl font-bold text-white">138</p>
-                    <p className="text-xs text-indigo-400 mt-1">Across 4 tools</p>
+                    <p className="text-xs text-indigo-400 mt-1">
+                      Across 4 tools
+                    </p>
                   </div>
                 </div>
               </div>

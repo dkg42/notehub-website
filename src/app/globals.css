@@ -188,3 +188,17 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Retro grid animation (used by hero-section-dark block) */
+@keyframes grid {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.animate-grid {
+  animation: grid 20s linear infinite;
+}
