@@ -4,16 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5866bcbd-df4d-44bc-9594-cee684343c0b" name="Changes" comment="Some UI changes">
-      <change afterPath="$PROJECT_DIR$/src/app/auth/layout.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/app/auth/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lib/firebase.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="5866bcbd-df4d-44bc-9594-cee684343c0b" name="Changes" comment="Added firebase authentication sign in for iframe headless mode">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/next.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/next.config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/auth/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/auth/page.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,7 +93,7 @@
       <workItem from="1774869810034" duration="9391000" />
       <workItem from="1774965799457" duration="1791000" />
       <workItem from="1775062597487" duration="3678000" />
-      <workItem from="1775200995527" duration="1362000" />
+      <workItem from="1775200995527" duration="7038000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -118,7 +111,15 @@
       <option name="project" value="LOCAL" />
       <updated>1774769857089</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Added firebase authentication sign in for iframe headless mode">
+      <option name="closed" value="true" />
+      <created>1775202995043</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1775202995043</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -127,6 +128,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initial commit" />
     <MESSAGE value="Some UI changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Some UI changes" />
+    <MESSAGE value="Added firebase authentication sign in for iframe headless mode" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added firebase authentication sign in for iframe headless mode" />
   </component>
 </project>
