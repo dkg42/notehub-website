@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5866bcbd-df4d-44bc-9594-cee684343c0b" name="Changes" comment="Added firebase authentication sign in for iframe headless mode">
+    <list default="true" id="5866bcbd-df4d-44bc-9594-cee684343c0b" name="Changes" comment="Add sign out logic">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/auth/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/auth/page.tsx" afterDir="false" />
     </list>
@@ -94,6 +94,10 @@
       <workItem from="1774965799457" duration="1791000" />
       <workItem from="1775062597487" duration="3678000" />
       <workItem from="1775200995527" duration="7038000" />
+      <workItem from="1775218847204" duration="1416000" />
+      <workItem from="1775280252995" duration="3867000" />
+      <workItem from="1775373135910" duration="1601000" />
+      <workItem from="1775495237184" duration="1087000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -119,7 +123,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775202995043</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Add sign out logic">
+      <option name="closed" value="true" />
+      <created>1775218885240</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1775218885240</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -129,6 +141,7 @@
     <MESSAGE value="Initial commit" />
     <MESSAGE value="Some UI changes" />
     <MESSAGE value="Added firebase authentication sign in for iframe headless mode" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added firebase authentication sign in for iframe headless mode" />
+    <MESSAGE value="Add sign out logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add sign out logic" />
   </component>
 </project>

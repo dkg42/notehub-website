@@ -11,7 +11,9 @@ import {
   type UserCredential,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import {type} from "node:os";
+
+// Stored at module level so it persists across sign-in/sign-out within the same iframe session
+let googleAccessToken: string | null = null;
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -49,20 +51,39 @@ export default function AuthPage() {
 
       const provider = getProvider(data.provider ?? 'google');
       signInWithPopup(auth, provider)
-        .then(result => sendResponse(result, 'notehub:auth-response'))
+        .then(result => {
+          if (data.provider === 'google' || !data.provider) {
+            googleAccessToken = GoogleAuthProvider.credentialFromResult(result)?.accessToken ?? null;
+          }
+          sendResponse(result, 'notehub:auth-response');
+        })
         .catch(result => sendResponse(result, 'notehub:auth-response'));
       globalThis.removeEventListener('message', onMessage);
       console.log('[auth] signIn listener removed');
     }
 
-    function onSignOutMessage({ data }: MessageEvent) {
+    // TODO token revocation wont work unless its the same iframe session. However usage in chrome extension is across different iframe sessions. Need to fix
+    async function onSignOutMessage({ data }: MessageEvent) {
       if (!data?.signOut) return;
+      globalThis.removeEventListener('message', onSignOutMessage);
+      console.log('[auth] signOut listener removed');
+
+      if (googleAccessToken) {
+        try {
+          await fetch('https://oauth2.googleapis.com/revoke', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `token=${googleAccessToken}`,
+          });
+        } catch {
+          // Revocation failure is non-fatal — proceed with Firebase sign-out
+        }
+        googleAccessToken = null;
+      }
 
       signOut(auth)
         .then(() => sendResponse({ signedOut: true }, 'notehub:sign-out-response'))
         .catch(result => sendResponse(result, 'notehub:sign-out-response'));
-      globalThis.removeEventListener('message', onSignOutMessage);
-      console.log('[auth] signOut listener removed');
     }
 
     globalThis.addEventListener('message', onMessage);
