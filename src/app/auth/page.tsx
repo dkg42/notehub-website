@@ -26,8 +26,12 @@ function getProvider(name: string): AuthProvider {
     case 'github':
       return new GithubAuthProvider();
     case 'google':
-    default:
-      return new GoogleAuthProvider();
+    default: {
+      const provider = new GoogleAuthProvider();
+      provider.addScope('https://www.googleapis.com/auth/drive.file');
+      provider.addScope('https://www.googleapis.com/auth/drive.appdata');
+      return provider;
+    }
   }
 }
 
