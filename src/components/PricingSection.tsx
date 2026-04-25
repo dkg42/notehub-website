@@ -3,7 +3,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Zap, Infinity } from "lucide-react";
+import { Check } from "lucide-react";
+import { initCheckout } from "@/components/CheckoutProvider";
+
+async function startCheckout(plan: string) {
+  const res = await fetch("/api/checkout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ plan }),
+  });
+  const { checkoutUrl } = await res.json();
+  if (checkoutUrl) initCheckout(checkoutUrl);
+}
 
 const freeFeatures = [
   "Export chats (up to 10/month)",
@@ -29,15 +40,6 @@ const proYearlyFeatures = [
   "Early access to new features",
 ];
 
-const lifetimeFeatures = [
-  "Everything in Pro, forever",
-  "One-time payment, no renewal",
-  "All future features included",
-  "Lifetime priority support",
-  "Early beta access",
-  "Founding member badge",
-];
-
 interface PlanCardProps {
   name: string;
   price: string;
@@ -47,7 +49,7 @@ interface PlanCardProps {
   cta: string;
   popular?: boolean;
   badge?: string;
-  iconColor?: string;
+  onCtaClick?: () => void;
 }
 
 function PlanCard({
@@ -59,6 +61,7 @@ function PlanCard({
   cta,
   popular,
   badge,
+  onCtaClick,
 }: PlanCardProps) {
   return (
     <article
@@ -68,7 +71,6 @@ function PlanCard({
           : "glass-card border border-white/[0.07]"
       }`}
     >
-      {/* Popular badge */}
       {badge && (
         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
           <Badge className="px-3 py-1 bg-blue-600 text-white text-xs font-semibold border-0 shadow-lg shadow-blue-600/30">
@@ -77,7 +79,6 @@ function PlanCard({
         </div>
       )}
 
-      {/* Plan header */}
       <div className="mb-6">
         <p className="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-1">
           {name}
@@ -93,9 +94,9 @@ function PlanCard({
         <p className="text-sm text-slate-400 leading-relaxed">{description}</p>
       </div>
 
-      {/* CTA */}
       <Button
         size="lg"
+        onClick={onCtaClick}
         className={`w-full h-11 font-semibold mb-7 cursor-pointer transition-all duration-200 ${
           popular
             ? "bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/30 hover:shadow-blue-500/40"
@@ -105,7 +106,6 @@ function PlanCard({
         {cta}
       </Button>
 
-      {/* Features */}
       <ul className="space-y-3 flex-1" role="list">
         {features.map((feature) => (
           <li key={feature} className="flex items-start gap-3 text-sm">
@@ -125,19 +125,22 @@ function PlanCard({
   );
 }
 
-export default function PricingSection() {
+interface PricingSectionProps {
+  monthlyPrice: string;
+  yearlyPrice: string;
+}
+
+export default function PricingSection({ monthlyPrice, yearlyPrice }: PricingSectionProps) {
   const [billing, setBilling] = useState<"monthly" | "yearly">("yearly");
 
   return (
     <section id="pricing" className="relative py-28 overflow-hidden">
-      {/* Background */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         <div className="ambient-blob w-[700px] h-[500px] bottom-0 left-1/2 -translate-x-1/2 bg-blue-600/8" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
         <div className="text-center mb-12">
           <p className="text-xs font-semibold text-blue-400 uppercase tracking-[0.2em] mb-4">
             Pricing
@@ -152,7 +155,6 @@ export default function PricingSection() {
           </p>
         </div>
 
-        {/* Billing toggle */}
         <div className="flex justify-center mb-10">
           <div
             className="glass rounded-full p-1 flex items-center gap-1"
@@ -187,9 +189,7 @@ export default function PricingSection() {
           </div>
         </div>
 
-        {/* Pricing cards — Monthly/Yearly */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {/* Free */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
           <PlanCard
             name="Free"
             price="$0"
@@ -198,93 +198,17 @@ export default function PricingSection() {
             features={freeFeatures}
             cta="Get Started Free"
           />
-
-          {/* Pro */}
           <PlanCard
             name="Pro"
-            price={billing === "monthly" ? "$9" : "$6"}
-            period={billing === "monthly" ? "/ month" : "/ month, billed yearly"}
+            price={billing === "monthly" ? monthlyPrice : yearlyPrice}
+            period={billing === "monthly" ? "/ month" : "/ year"}
             description="Everything you need to maximize your NotebookLM workflow."
             features={billing === "yearly" ? proYearlyFeatures : proMonthlyFeatures}
             cta="Start Pro"
             popular
             badge="Most Popular"
+            onCtaClick={() => startCheckout(billing === "monthly" ? "pro_monthly" : "pro_yearly")}
           />
-
-          {/* Teams (placeholder) */}
-          <PlanCard
-            name="Teams"
-            price="$12"
-            period={billing === "monthly" ? "/ user / month" : "/ user / month, billed yearly"}
-            description="For teams that collaborate on research, study, and AI-powered projects."
-            features={[
-              "Everything in Pro",
-              "Team workspace & sharing",
-              "Shared prompt library",
-              "Admin dashboard",
-              "SSO & centralized billing",
-              "Dedicated account manager",
-            ]}
-            cta="Contact Sales"
-          />
-        </div>
-
-        {/* Lifetime card */}
-        <div className="max-w-2xl mx-auto">
-          <article className="relative rounded-2xl p-8 overflow-hidden border border-indigo-500/25 bg-gradient-to-br from-indigo-600/15 via-violet-600/10 to-transparent hover-lift">
-            {/* Glow */}
-            <div
-              className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 to-transparent pointer-events-none"
-              aria-hidden="true"
-            />
-
-            <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-9 h-9 rounded-xl bg-indigo-500/20 flex items-center justify-center">
-                    <Infinity
-                      className="w-5 h-5 text-indigo-400"
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-indigo-400 uppercase tracking-widest">
-                      Lifetime
-                    </p>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-extrabold text-white tabular-nums">
-                        $149
-                      </span>
-                      <span className="text-slate-500 text-sm">one-time</span>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-sm text-slate-400 mb-4 leading-relaxed">
-                  Pay once, own NoteHub Pro forever. All current and future features included. No subscriptions, ever.
-                </p>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {lifetimeFeatures.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-slate-300">
-                      <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0" aria-hidden="true" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="w-full sm:w-auto shrink-0">
-                <Button
-                  size="lg"
-                  className="w-full sm:w-auto h-11 px-8 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-lg shadow-indigo-600/30 hover:shadow-indigo-500/40 transition-all duration-200 cursor-pointer"
-                >
-                  <Zap className="w-4 h-4 mr-2" aria-hidden="true" />
-                  Get Lifetime Access
-                </Button>
-                <p className="text-xs text-slate-500 text-center mt-2">
-                  Limited early-bird pricing
-                </p>
-              </div>
-            </div>
-          </article>
         </div>
       </div>
     </section>
