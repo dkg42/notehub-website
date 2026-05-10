@@ -21,8 +21,7 @@ interface SubscriptionClaims {
   currentPeriodEnd: string | null;
 }
 
-// Stored at module level so it persists across sign-in/sign-out within the same iframe session
-let googleAccessToken: string | null = null;
+const STORE_TOKEN_URL = process.env.NEXT_PUBLIC_CLOUD_FUNCTIONS_BASE_URL + '/storeGoogleToken';
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -55,7 +54,7 @@ export default function AuthPage() {
   useEffect(() => {
     const PARENT_FRAME = document.location.ancestorOrigins[0];
 
-    function sendResponse(result: any, type: string) {
+    function sendResponse(result: unknown, type: string) {
       globalThis.parent.self.postMessage(
         JSON.stringify({ type: type, payload: result }),
         PARENT_FRAME,
@@ -78,22 +77,49 @@ export default function AuthPage() {
           const { subscriptionStatus } = idTokenResult.claims as unknown as SubscriptionClaims;
           if (subscriptionStatus === 'active') {
             driveAccessToken = GoogleAuthProvider.credentialFromResult(result)?.accessToken ?? null;
-            googleAccessToken = driveAccessToken;
+
+            // Store the Google OAuth refresh token server-side so the extension never holds
+            // the token that requires client_secret to use. The extension will call the
+            // refreshGoogleToken Cloud Function (authenticated with a Firebase ID token)
+            // whenever it needs a new Drive access token.
+            const tokenResponse = (result as unknown as Record<string, unknown>)._tokenResponse as Record<string, unknown> | undefined;
+            const googleRefreshToken = tokenResponse?.refreshToken as string | undefined;
+            if (googleRefreshToken) {
+              const firebaseIdToken = await result.user.getIdToken();
+              try {
+                await fetch(STORE_TOKEN_URL, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${firebaseIdToken}`,
+                  },
+                  body: JSON.stringify({
+                    refreshToken: googleRefreshToken,
+                    scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata',
+                  }),
+                });
+              } catch (err) {
+                console.error('[auth] Failed to store token server-side', err);
+                // Non-fatal: the extension will get the access token for this session
+                // but refresh will fail until the user signs in again.
+              }
+            }
           }
         }
 
-        const tokenResponse = (result as any)._tokenResponse as Record<string, unknown> | undefined;
+        const tokenResponse = (result as unknown as Record<string, unknown>)._tokenResponse as Record<string, unknown> | undefined;
         sendResponse({
           user: {
             uid: result.user.uid,
             email: result.user.email,
             displayName: result.user.displayName,
             photoURL: result.user.photoURL,
+            stsTokenManager: (result.user as unknown as Record<string, unknown>).stsTokenManager,
           },
           _tokenResponse: {
             oauthAccessToken: driveAccessToken, // gated: null unless subscription is active
             oauthExpireIn: tokenResponse?.oauthExpireIn ?? null,
-            refreshToken: tokenResponse?.refreshToken ?? null,
+            // refreshToken intentionally omitted — stored server-side via storeGoogleToken CF
             rawUserInfo: tokenResponse?.rawUserInfo ?? null,
             idToken: tokenResponse?.idToken ?? null,
           },
@@ -104,25 +130,14 @@ export default function AuthPage() {
       }
     }
 
-    // TODO token revocation wont work unless its the same iframe session. However usage in chrome extension is across different iframe sessions. Need to fix
     async function onSignOutMessage({ data }: MessageEvent) {
       if (!data?.signOut) return;
       globalThis.removeEventListener('message', onSignOutMessage);
       console.log('[auth] signOut listener removed');
 
-      if (googleAccessToken) {
-        try {
-          await fetch('https://oauth2.googleapis.com/revoke', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `token=${googleAccessToken}`,
-          });
-        } catch {
-          // Revocation failure is non-fatal — proceed with Firebase sign-out
-        }
-        googleAccessToken = null;
-      }
-
+      // Google OAuth token revocation is handled server-side by the revokeGoogleToken
+      // Cloud Function, which the extension calls before triggering this sign-out.
+      // Here we only need to clear the Firebase session.
       signOut(auth)
         .then(() => sendResponse({ signedOut: true }, 'notehub:sign-out-response'))
         .catch(result => sendResponse(result, 'notehub:sign-out-response'));
