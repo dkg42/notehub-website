@@ -8,9 +8,18 @@ import {
   FacebookAuthProvider,
   GithubAuthProvider,
   type AuthProvider,
-  type UserCredential,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+
+type SubscriptionStatus = 'active' | 'cancelled' | 'expired' | 'on_hold' | 'none';
+
+interface SubscriptionClaims {
+  subscriptionStatus: SubscriptionStatus;
+  subscriptionPlan: string | null;
+  subscriptionId: string | null;
+  customerId: string | null;
+  currentPeriodEnd: string | null;
+}
 
 // Stored at module level so it persists across sign-in/sign-out within the same iframe session
 let googleAccessToken: string | null = null;
@@ -19,20 +28,23 @@ let googleAccessToken: string | null = null;
 // Shared helpers
 // ---------------------------------------------------------------------------
 
-function getProvider(name: string): AuthProvider {
+function getBaseProvider(name: string): AuthProvider {
   switch (name) {
     case 'facebook':
       return new FacebookAuthProvider();
     case 'github':
       return new GithubAuthProvider();
     case 'google':
-    default: {
-      const provider = new GoogleAuthProvider();
-      provider.addScope('https://www.googleapis.com/auth/drive.file');
-      provider.addScope('https://www.googleapis.com/auth/drive.appdata');
-      return provider;
-    }
+    default:
+      return new GoogleAuthProvider();
   }
+}
+
+function getDriveProvider(): GoogleAuthProvider {
+  const provider = new GoogleAuthProvider();
+  provider.addScope('https://www.googleapis.com/auth/drive.file');
+  provider.addScope('https://www.googleapis.com/auth/drive.appdata');
+  return provider;
 }
 
 // ---------------------------------------------------------------------------
@@ -50,20 +62,46 @@ export default function AuthPage() {
       );
     }
 
-    function onMessage({ data }: MessageEvent) {
+    async function onMessage({ data }: MessageEvent) {
       if (!data?.initAuth) return;
-
-      const provider = getProvider(data.provider ?? 'google');
-      signInWithPopup(auth, provider)
-        .then(result => {
-          if (data.provider === 'google' || !data.provider) {
-            googleAccessToken = GoogleAuthProvider.credentialFromResult(result)?.accessToken ?? null;
-          }
-          sendResponse(result, 'notehub:auth-response');
-        })
-        .catch(result => sendResponse(result, 'notehub:auth-response'));
       globalThis.removeEventListener('message', onMessage);
       console.log('[auth] signIn listener removed');
+
+      try {
+        const isGoogle = data.provider === 'google' || !data.provider;
+        const provider = isGoogle ? getDriveProvider() : getBaseProvider(data.provider);
+        const result = await signInWithPopup(auth, provider);
+
+        let driveAccessToken: string | null = null;
+        if (isGoogle) {
+          const idTokenResult = await result.user.getIdTokenResult();
+          const { subscriptionStatus } = idTokenResult.claims as unknown as SubscriptionClaims;
+          if (subscriptionStatus === 'active') {
+            driveAccessToken = GoogleAuthProvider.credentialFromResult(result)?.accessToken ?? null;
+            googleAccessToken = driveAccessToken;
+          }
+        }
+
+        const tokenResponse = (result as any)._tokenResponse as Record<string, unknown> | undefined;
+        sendResponse({
+          user: {
+            uid: result.user.uid,
+            email: result.user.email,
+            displayName: result.user.displayName,
+            photoURL: result.user.photoURL,
+          },
+          _tokenResponse: {
+            oauthAccessToken: driveAccessToken, // gated: null unless subscription is active
+            oauthExpireIn: tokenResponse?.oauthExpireIn ?? null,
+            refreshToken: tokenResponse?.refreshToken ?? null,
+            rawUserInfo: tokenResponse?.rawUserInfo ?? null,
+            idToken: tokenResponse?.idToken ?? null,
+          },
+          driveAccessToken,
+        }, 'notehub:auth-response');
+      } catch (err) {
+        sendResponse(err, 'notehub:auth-response');
+      }
     }
 
     // TODO token revocation wont work unless its the same iframe session. However usage in chrome extension is across different iframe sessions. Need to fix
@@ -101,4 +139,5 @@ export default function AuthPage() {
     globalThis.parent.postMessage({ type: 'notehub:iframe-ready' }, PARENT_FRAME);
   }, []);
 
+  return null;
 }
