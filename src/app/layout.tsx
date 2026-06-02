@@ -1,19 +1,27 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import CheckoutProvider from "@/components/CheckoutProvider";
+import RevealOnScroll from "@/components/RevealOnScroll";
 
-const plusJakarta = Plus_Jakarta_Sans({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-  variable: "--font-plus-jakarta",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-jetbrains-mono",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "NoteHub — Supercharge Your NotebookLM",
+  title: "Notehublm — Your second brain for AI chats",
   description:
-    "NoteHub is a Chrome extension that unlocks the full potential of NotebookLM. Export chats, save prompts, manage notebooks, and access all your AI chats in one place.",
+    "Notehublm is a Chrome extension that supercharges NotebookLM. Save prompts, capture conversations, annotate screenshots, and automate notebooks across 9 AI platforms — synced to your Google account.",
   keywords: [
     "NotebookLM",
     "Chrome extension",
@@ -26,12 +34,14 @@ export const metadata: Metadata = {
     "Claude",
   ],
   openGraph: {
-    title: "NoteHub — Supercharge Your NotebookLM",
+    title: "Notehublm — Your second brain for AI chats",
     description:
-      "Export chats, save prompts, manage notebooks, and unify all your AI chats in one powerful dashboard.",
+      "Save prompts, capture conversations, annotate screenshots, and automate notebooks across 9 AI platforms.",
     type: "website",
   },
 };
+
+const themeInitScript = `(function(){try{var t=localStorage.getItem('nh-theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}})();`;
 
 export default function RootLayout({
   children,
@@ -39,10 +49,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${plusJakarta.variable} dark h-full`}>
-      <body className="min-h-full font-sans antialiased">
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
+      <body className="antialiased">
         <CheckoutProvider />
         {children}
+        <RevealOnScroll />
       </body>
     </html>
   );

@@ -5,8 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5866bcbd-df4d-44bc-9594-cee684343c0b" name="Changes" comment="save refresh tokens to cloud functions">
+      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/auth/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/auth/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/CTASection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/CTASection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/FAQSection.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/FeaturesSection.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Footer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Footer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/HeroSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/HeroSection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Navbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Navbar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/PricingSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/PricingSection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/blocks/hero-section-dark.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/accordion.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/bento-grid.tsx" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

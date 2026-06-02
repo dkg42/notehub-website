@@ -1,8 +1,12 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import FeaturesSection from "@/components/FeaturesSection";
+import PlatformsSection from "@/components/PlatformsSection";
+import SurfacesSection from "@/components/SurfacesSection";
+import ToolsSection from "@/components/ToolsSection";
+import DashboardBentoSection from "@/components/DashboardBentoSection";
+import FoundationsSection from "@/components/FoundationsSection";
+import ScreenshotEditorSection from "@/components/ScreenshotEditorSection";
 import PricingSection from "@/components/PricingSection";
-import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 import { dodo } from "@/lib/dodo";
@@ -28,16 +32,20 @@ export default async function Home() {
   const { monthlyPrice, yearlyPrice } = await getPrices();
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e]">
+    <>
       <Navbar />
       <main>
         <HeroSection />
-        <FeaturesSection />
+        <PlatformsSection />
+        <SurfacesSection />
+        <ToolsSection />
+        <DashboardBentoSection />
+        <FoundationsSection />
+        <ScreenshotEditorSection />
         <PricingSection monthlyPrice={monthlyPrice} yearlyPrice={yearlyPrice} />
-        <FAQSection />
         <CTASection />
       </main>
       <Footer />
-    </div>
+    </>
   );
 }

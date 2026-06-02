@@ -6,7 +6,11 @@
       "Bash(npx tsc:*)",
       "Bash(grep -E '\\\\.\\(tsx?|css\\)$')",
       "WebFetch(domain:firebase.google.com)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "WebFetch(domain:api.anthropic.com)",
+      "Bash(curl -sI \"https://api.anthropic.com/v1/design/h/uudvZOOZIuElTxT2TXh3dw\")",
+      "Bash(mkdir -p /tmp/notehub-design)",
+      "Bash(tar -xf /tmp/notehub-design.html -C /tmp/notehub-design)"
     ]
   }
 }
