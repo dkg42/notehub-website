@@ -9,7 +9,8 @@ import {
   GithubAuthProvider,
   type AuthProvider,
 } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { httpsCallable } from 'firebase/functions';
+import { auth, functions } from '@/lib/firebase';
 
 type SubscriptionStatus = 'active' | 'cancelled' | 'expired' | 'on_hold' | 'none';
 
@@ -21,7 +22,6 @@ interface SubscriptionClaims {
   currentPeriodEnd: string | null;
 }
 
-const STORE_TOKEN_URL = process.env.NEXT_PUBLIC_CLOUD_FUNCTIONS_BASE_URL + '/storeGoogleToken';
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
 const GIS_SRC = 'https://accounts.google.com/gsi/client';
 const DRIVE_SCOPES = [
@@ -112,7 +112,7 @@ function loadGisScript(): Promise<void> {
  *
  * Returns the Drive access token along with the signed-in user credential.
  */
-async function signInWithGoogleCodeFlow(): Promise<{ accessToken: string; expiresIn: number; scope: string }> {
+async function signInWithGoogleCodeFlow(): Promise<{ customToken: string; accessToken: string; expiresIn: number; scope: string }> {
   await loadGisScript();
   if (!GOOGLE_CLIENT_ID) {
     throw new Error('NEXT_PUBLIC_GOOGLE_CLIENT_ID is not set');
@@ -148,22 +148,18 @@ async function signInWithGoogleCodeFlow(): Promise<{ accessToken: string; expire
     client.requestCode();
   });
 
-  // Exchange the code server-side. No Authorization header — the code is the credential.
-  const r = await fetch(STORE_TOKEN_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code, redirectUri: 'postmessage' }),
-  });
-  if (!r.ok) {
-    const errBody = await r.json().catch(() => ({}));
-    throw new Error(errBody.error || `storeGoogleToken failed: ${r.status}`);
-  }
-  const { customToken, accessToken, expiresIn, scope } = await r.json() as {
-    customToken: string; accessToken: string; expiresIn: number; scope: string;
-  };
+  // Exchange the code server-side via the callable CF. The SDK wraps the payload
+  // as `{ data }`, unwraps the `{ result }` response, and throws a FirebaseError
+  // (code `functions/*`) on failure — no manual status handling needed.
+  const storeGoogleToken = httpsCallable<
+    { code: string; redirectUri: string },
+    { customToken: string; accessToken: string; expiresIn: number; scope: string }
+  >(functions, 'storeGoogleToken');
+  const { data } = await storeGoogleToken({ code, redirectUri: 'postmessage' });
+  const { customToken, accessToken, expiresIn, scope } = data;
 
   await signInWithCustomToken(auth, customToken);
-  return { accessToken, expiresIn, scope };
+  return { customToken, accessToken, expiresIn, scope };
 }
 
 // ---------------------------------------------------------------------------
@@ -191,6 +187,7 @@ export default function AuthPage() {
         let driveAccessToken: string | null = null;
         let expiresIn: number | null = null;
         let grantedScopes: string = '';
+        let customToken: string | null = null;
         let user;
 
         if (isGoogle) {
@@ -198,6 +195,7 @@ export default function AuthPage() {
           const result = await signInWithGoogleCodeFlow();
           expiresIn = result.expiresIn;
           grantedScopes = result.scope ?? '';
+          customToken = result.customToken;
           user = auth.currentUser;
           if (!user) throw new Error('Firebase sign-in did not produce a current user');
 
@@ -231,6 +229,10 @@ export default function AuthPage() {
             idToken: await user.getIdToken(),
           },
           driveAccessToken,
+          // Firebase custom token (Google flow only) — lets the extension
+          // establish its own SDK session via signInWithCustomToken. The
+          // extension always drives the Google path, so this is always set there.
+          customToken,
         }, 'notehub:auth-response');
       } catch (err) {
         // Use the `error` field shape so the extension's offscreen handler
