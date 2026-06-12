@@ -1,0 +1,80 @@
+# Firebase App Hosting configuration
+# Docs: https://firebase.google.com/docs/app-hosting/configure
+#
+# Cloud Run settings for the Next.js server (SSR, server components, API routes).
+
+runConfig:
+  # Scale to zero when idle to avoid paying for unused instances.
+  minInstances: 0
+  maxInstances: 100
+  # Requests served concurrently per instance (Next.js handles this well).
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 512
+
+# Environment variables.
+#   availability:
+#     BUILD   -> available during `next build` (required for NEXT_PUBLIC_* which
+#                are inlined at build time, and for anything read during prerender)
+#     RUNTIME -> available to the running server (SSR / API routes)
+#
+# Every variable is pulled from Cloud Secret Manager via `secret:` so values can
+# differ per environment (test vs prod) without editing this committed file.
+# Each test/prod Firebase project holds its own secret of the same name, so the
+# short `secret: NAME` form resolves to the right value for whichever backend is
+# being deployed. (Adjust the `secret:` names if yours differ from the variables.)
+#
+# NOTE: NEXT_PUBLIC_* values are inlined into the client bundle at build time, so
+# they are NOT actually private — sourcing them from Secret Manager here is only
+# to vary them per environment, not for confidentiality.
+env:
+  # --- Public (client-exposed, inlined at build) ----------------------------
+  - variable: NEXT_PUBLIC_APP_URL
+    secret: NEXT_PUBLIC_APP_URL
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_DODO_ENV
+    secret: NEXT_PUBLIC_DODO_ENV
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_CLOUD_FUNCTIONS_BASE_URL
+    secret: NEXT_PUBLIC_CLOUD_FUNCTIONS_BASE_URL
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_GOOGLE_CLIENT_ID
+    secret: NEXT_PUBLIC_GOOGLE_CLIENT_ID
+    availability:
+      - BUILD
+      - RUNTIME
+
+  # --- Server-side config (not exposed to the client) -----------------------
+  - variable: DODO_ENV
+    secret: DODO_ENV
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: DODO_PRODUCT_ID_PRO_MONTHLY
+    secret: DODO_PRODUCT_ID_PRO_MONTHLY
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: DODO_PRODUCT_ID_PRO_YEARLY
+    secret: DODO_PRODUCT_ID_PRO_YEARLY
+    availability:
+      - BUILD
+      - RUNTIME
+
+  # --- Secret ---------------------------------------------------------------
+  - variable: DODO_PAYMENTS_API_KEY
+    secret: DODO_PAYMENTS_API_KEY
+    availability:
+      - BUILD
+      - RUNTIME

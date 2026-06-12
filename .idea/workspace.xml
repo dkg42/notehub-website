@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5866bcbd-df4d-44bc-9594-cee684343c0b" name="Changes" comment="Update application to use firebase sdk callable functions for cloud functions">
+    <list default="true" id="5866bcbd-df4d-44bc-9594-cee684343c0b" name="Changes" comment="set up git hub work flow to cascade changes from release branch">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -181,7 +181,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780728635135</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="set up git hub work flow to cascade changes from release branch">
+      <option name="closed" value="true" />
+      <created>1781260609106</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1781260609106</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -198,6 +206,7 @@
     <MESSAGE value="Update website to new UI" />
     <MESSAGE value="update dependencies" />
     <MESSAGE value="Update application to use firebase sdk callable functions for cloud functions" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update application to use firebase sdk callable functions for cloud functions" />
+    <MESSAGE value="set up git hub work flow to cascade changes from release branch" />
+    <option name="LAST_COMMIT_MESSAGE" value="set up git hub work flow to cascade changes from release branch" />
   </component>
 </project>
