@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="site">
@@ -12,10 +14,13 @@ export default function Footer() {
           Notehublm
         </div>
         <div className="links">
-          <a href="#tools">Tools</a>
-          <a href="#dashboard">Dashboard</a>
-          <a href="#pricing">Pricing</a>
-          <a href="#install">Install</a>
+          <a href="/#tools">Tools</a>
+          <a href="/#dashboard">Dashboard</a>
+          <a href="/#pricing">Pricing</a>
+          <a href="/#install">Install</a>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+          <Link href="/refunds">Refunds</Link>
         </div>
         <div>© {new Date().getFullYear()} Notehublm · Synced to your Google account</div>
       </div>

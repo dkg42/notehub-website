@@ -1,14 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import {
-  signInWithPopup,
-  signInWithCustomToken,
-  signOut,
-  FacebookAuthProvider,
-  GithubAuthProvider,
-  type AuthProvider,
-} from 'firebase/auth';
+import { signInWithCustomToken, signOut } from 'firebase/auth';
 import { httpsCallable } from 'firebase/functions';
 import { auth, functions } from '@/lib/firebase';
 
@@ -73,16 +66,6 @@ declare global {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function getBaseProvider(name: string): AuthProvider {
-  switch (name) {
-    case 'facebook':
-      return new FacebookAuthProvider();
-    case 'github':
-    default:
-      return new GithubAuthProvider();
-  }
-}
 
 function loadGisScript(): Promise<void> {
   if (typeof window === 'undefined') return Promise.reject(new Error('No window'));
@@ -183,32 +166,24 @@ export default function AuthPage() {
       console.log('[auth] signIn listener removed');
 
       try {
-        const isGoogle = data.provider === 'google' || !data.provider;
+        // Google is the only supported identity provider.
+        if (data.provider && data.provider !== 'google') {
+          throw new Error(`Unsupported auth provider: ${data.provider}`);
+        }
+
+        // GIS code flow → server-side exchange → Firebase custom token sign-in.
+        const result = await signInWithGoogleCodeFlow();
+        const expiresIn = result.expiresIn;
+        const grantedScopes = result.scope ?? '';
+        const customToken = result.customToken;
+        const user = auth.currentUser;
+        if (!user) throw new Error('Firebase sign-in did not produce a current user');
+
         let driveAccessToken: string | null = null;
-        let expiresIn: number | null = null;
-        let grantedScopes: string = '';
-        let customToken: string | null = null;
-        let user;
-
-        if (isGoogle) {
-          // GIS code flow → server-side exchange → Firebase custom token sign-in.
-          const result = await signInWithGoogleCodeFlow();
-          expiresIn = result.expiresIn;
-          grantedScopes = result.scope ?? '';
-          customToken = result.customToken;
-          user = auth.currentUser;
-          if (!user) throw new Error('Firebase sign-in did not produce a current user');
-
-          const idTokenResult = await user.getIdTokenResult();
-          const { subscriptionStatus } = idTokenResult.claims as unknown as SubscriptionClaims;
-          if (subscriptionStatus === 'active') {
-            driveAccessToken = result.accessToken;
-          }
-        } else {
-          // Non-Google providers retain the standard Firebase popup flow.
-          const provider = getBaseProvider(data.provider);
-          const credResult = await signInWithPopup(auth, provider);
-          user = credResult.user;
+        const idTokenResult = await user.getIdTokenResult();
+        const { subscriptionStatus } = idTokenResult.claims as unknown as SubscriptionClaims;
+        if (subscriptionStatus === 'active') {
+          driveAccessToken = result.accessToken;
         }
 
         sendResponse({
@@ -229,9 +204,8 @@ export default function AuthPage() {
             idToken: await user.getIdToken(),
           },
           driveAccessToken,
-          // Firebase custom token (Google flow only) — lets the extension
-          // establish its own SDK session via signInWithCustomToken. The
-          // extension always drives the Google path, so this is always set there.
+          // Firebase custom token — lets the extension establish its own SDK
+          // session via signInWithCustomToken.
           customToken,
         }, 'notehub:auth-response');
       } catch (err) {
