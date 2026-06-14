@@ -29,31 +29,29 @@ runConfig:
 # to vary them per environment, not for confidentiality.
 env:
   # --- Public (client-exposed, inlined at build) ----------------------------
-  - variable: NEXT_PUBLIC_APP_URL
-    secret: NEXT_PUBLIC_APP_URL
-    availability:
-      - BUILD
-      - RUNTIME
-
+  # These are read only in 'use client' components, so they are inlined into the
+  # browser bundle at build time and never read by the server at runtime -> BUILD only.
   - variable: NEXT_PUBLIC_DODO_ENV
     secret: NEXT_PUBLIC_DODO_ENV
     availability:
       - BUILD
-      - RUNTIME
-
-  - variable: NEXT_PUBLIC_CLOUD_FUNCTIONS_BASE_URL
-    secret: NEXT_PUBLIC_CLOUD_FUNCTIONS_BASE_URL
-    availability:
-      - BUILD
-      - RUNTIME
 
   - variable: NEXT_PUBLIC_GOOGLE_CLIENT_ID
     secret: NEXT_PUBLIC_GOOGLE_CLIENT_ID
     availability:
       - BUILD
-      - RUNTIME
 
   # --- Server-side config (not exposed to the client) -----------------------
+  # APP_URL is read only in the dynamic checkout API route, never at build/prerender
+  # and never in the client -> RUNTIME only.
+  - variable: APP_URL
+    secret: APP_URL
+    availability:
+      - RUNTIME
+
+  # The DODO_* vars below keep BUILD because page.tsx is prerendered at build and its
+  # getPrices() calls the DodoPayments API during prerender (via lib/dodo.ts). They
+  # also keep RUNTIME because the checkout API route uses them at request time.
   - variable: DODO_ENV
     secret: DODO_ENV
     availability:
