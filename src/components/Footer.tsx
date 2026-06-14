@@ -1,17 +1,13 @@
 import Link from "next/link";
+import HubLogo, { Wordmark } from "@/components/HubLogo";
 
 export default function Footer() {
   return (
     <footer className="site">
       <div className="wrap">
         <div className="brand">
-          <span
-            className="logo-tile"
-            style={{ width: 24, height: 24, fontSize: 14, borderRadius: 7 }}
-          >
-            n
-          </span>{" "}
-          Notehublm
+          <HubLogo size={26} />
+          <Wordmark size={17} />
         </div>
         <div className="links">
           <a href="/#tools">Tools</a>
@@ -22,7 +18,7 @@ export default function Footer() {
           <Link href="/terms">Terms</Link>
           <Link href="/refunds">Refunds</Link>
         </div>
-        <div>© {new Date().getFullYear()} Notehublm · Synced to your Google account</div>
+        <div>© {new Date().getFullYear()} noteHubLM · Synced to your Google account</div>
       </div>
     </footer>
   );

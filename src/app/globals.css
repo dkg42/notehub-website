@@ -83,6 +83,17 @@ img { display: block; max-width: 100%; }
   color: var(--accent-ink); font-weight: 800; font-size: 17px;
   box-shadow: 0 4px 14px -4px rgba(129,140,248,.7);
 }
+.hub-logo { width: 30px; height: 30px; flex-shrink: 0; color: var(--text); display: block; }
+.hub-logo .spokes { stroke: currentColor; }
+.hub-logo .nodes { fill: currentColor; }
+.hub-logo .ring { fill: none; stroke: currentColor; }
+.wordmark {
+  font-family: var(--font-sora), var(--sans);
+  font-weight: 400; font-size: 19px; letter-spacing: -0.02em;
+  color: var(--text); line-height: 1; white-space: nowrap;
+}
+.wordmark b { font-weight: 700; }
+.wordmark .lm { font-weight: 400; }
 .hdr nav { display: flex; gap: 28px; }
 .hdr nav a { font-size: 14px; color: var(--text-2); transition: color .2s; }
 .hdr nav a:hover { color: var(--text); }

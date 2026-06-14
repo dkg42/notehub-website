@@ -4,9 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5866bcbd-df4d-44bc-9594-cee684343c0b" name="Changes" comment="Add app hosting file">
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
+    <list default="true" id="5866bcbd-df4d-44bc-9594-cee684343c0b" name="Changes" comment="update privacy policy, refund policy and terms of service">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/db-analytics.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/db-analytics.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/db-home.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/db-home.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/db-notebook.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/db-notebook.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/db-pipelines.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/db-pipelines.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/db-screenshot.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/db-screenshot.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/db-sources.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/db-sources.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/sp-tools.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/sp-tools.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Footer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Footer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Navbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Navbar.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -198,7 +208,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781263460670</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="update privacy policy, refund policy and terms of service">
+      <option name="closed" value="true" />
+      <created>1781267056120</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1781267056120</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -217,6 +235,7 @@
     <MESSAGE value="Update application to use firebase sdk callable functions for cloud functions" />
     <MESSAGE value="set up git hub work flow to cascade changes from release branch" />
     <MESSAGE value="Add app hosting file" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add app hosting file" />
+    <MESSAGE value="update privacy policy, refund policy and terms of service" />
+    <option name="LAST_COMMIT_MESSAGE" value="update privacy policy, refund policy and terms of service" />
   </component>
 </project>

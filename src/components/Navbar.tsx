@@ -1,11 +1,12 @@
 import ThemeToggle from "@/components/ThemeToggle";
+import HubLogo, { Wordmark } from "@/components/HubLogo";
 
 export default function Navbar() {
   return (
     <header className="hdr" id="hdr">
-      <a className="brand" href="/#top">
-        <span className="logo-tile">n</span>
-        Notehublm
+      <a className="brand" href="/#top" aria-label="noteHubLM home">
+        <HubLogo />
+        <Wordmark />
       </a>
       <nav>
         <a href="/#surfaces">How it works</a>
