@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "notehublm-a2490",
+    "uat": "notehublm-a2490",
+    "prod": "notehublm-prod"
+  }
+}
