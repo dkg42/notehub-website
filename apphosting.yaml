@@ -6,7 +6,10 @@
 runConfig:
   # Scale to zero when idle to avoid paying for unused instances.
   minInstances: 0
-  maxInstances: 100
+  # Capped at 20: a new project's default Cloud Run quota allows 20 vCPU /
+  # 40 GiB per region, so 20 instances x (cpu:1, 512MiB) is the ceiling.
+  # Request a quota increase (CpuAllocPerProjectRegion) to raise this.
+  maxInstances: 10
   # Requests served concurrently per instance (Next.js handles this well).
   concurrency: 80
   cpu: 1
