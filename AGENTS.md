@@ -1,218 +1,77 @@
-<!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
+This version has breaking changes — APIs, conventions, and file structure may all differ
+from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before
+writing any code. Heed deprecation notices.
 
 ---
 
-# NoteHub Website — Project Documentation
+# noteHubLM Website — Notes for Agents
 
-## What This Project Is
+Start with [README.md](./README.md): it documents the stack, the file layout, every
+environment variable, the checkout flow, and the `/auth` iframe protocol. This file only
+covers what an agent working in this repo needs beyond that.
 
-NoteHub is a **marketing/landing page website** for a Chrome extension that enhances Google NotebookLM. The website also hosts the **authentication iframe** used by the extension. It is not a full-stack app — there is no database, no user accounts on the website itself.
+## Ground truth vs. assumptions
 
-**Target users:** Researchers, students, and knowledge workers who use Google NotebookLM.
+This repo has drifted from older descriptions of it. Verify before relying on any of
+these:
 
----
+- **Google is the only identity provider.** Facebook and GitHub were removed. Passing
+  any other `provider` to `/auth` throws.
+- **Sign-in is the GIS authorization-code flow**, not `signInWithPopup`. The code is
+  exchanged by the `storeGoogleToken` callable Cloud Function, which returns a Firebase
+  custom token; the page then calls `signInWithCustomToken`.
+- **postMessage types are `notehub:iframe-ready`, `notehub:auth-response`, and
+  `notehub:sign-out-response`** — not `AUTH_SUCCESS` / `SIGN_OUT_SUCCESS`.
+- **The server base URL variable is `APP_URL`**, not `NEXT_PUBLIC_APP_URL`.
+- **Fonts are Inter, Sora, and JetBrains Mono** via `next/font/google`.
+- The page sections are `Hero`, `Platforms`, `Surfaces`, `Tools`, `DashboardBento`,
+  `Foundations`, `ScreenshotEditor`, `Pricing`, `CTA`. There is no FAQ section and no
+  `FeaturesSection`.
 
-## Tech Stack
+## Repository boundaries
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js (App Router) |
-| UI | React 19, Base UI, shadcn/ui |
-| Styling | Tailwind CSS 4, custom globals |
-| Icons | Lucide React |
-| Payments | DodoPayments SDK |
-| Auth | Firebase (for Chrome extension) |
-| Font | Plus Jakarta Sans |
-| Language | TypeScript |
+Only the website lives here. The Chrome extension and the Cloud Functions backend that
+sets Firebase custom claims and brokers Google tokens are separate repositories. Do not
+invent code for them; if a change needs both sides, say so.
 
----
+## Do not break these
 
-## Project Structure
+- `src/app/auth/page.tsx` — the Drive access token is released only when the Firebase
+  custom claim `subscriptionStatus === 'active'`. This gate is the paywall for Drive
+  sync. Responses go to `document.location.ancestorOrigins[0]`, never `'*'`.
+- `next.config.ts` — the `/auth` route's `frame-ancestors` CSP and `Cache-Control:
+  no-store` headers.
+- `src/app/api/checkout/route.ts` — failures are logged server-side and answered with a
+  generic `{ error: "Checkout failed" }`. Do not add upstream error text to the response.
+- `.gitignore` — `.env*` (except `.env.example`), `certificates/`, and editor
+  directories stay ignored. Real credential values never enter the repo; add new config
+  to `.env.example` with a placeholder.
 
-```
-src/
-  app/
-    page.tsx                  # Home page — renders all marketing sections
-    layout.tsx                # Root layout — metadata, CheckoutProvider wrapper
-    globals.css               # Theme, animations, glass effects, custom utilities
-    auth/
-      page.tsx                # Iframe auth page for Chrome extension
-    api/
-      checkout/
-        route.ts              # POST /api/checkout — creates DodoPayments session
-    checkout/
-      success/page.tsx        # Post-payment success landing page
-  components/
-    Navbar.tsx                # Responsive header with mobile menu
-    HeroSection.tsx           # Hero banner with animated background
-    FeaturesSection.tsx       # Bento grid feature showcase
-    PricingSection.tsx        # Pricing cards with monthly/yearly toggle
-    FAQSection.tsx            # Collapsible FAQ accordion (10 FAQs)
-    CTASection.tsx            # Final conversion call-to-action
-    Footer.tsx                # Footer with links and social icons
-    CheckoutProvider.tsx      # DodoPayments SDK initialization wrapper
-  lib/
-    firebase.ts               # Firebase app + auth instance (public config)
-    dodo.ts                   # DodoPayments client initialization
-    utils.ts                  # cn() utility (classname merge)
-```
+## Conventions
 
----
+- App Router, TypeScript, Tailwind CSS 4. Design tokens, glass effects, and the retro
+  grid live in `src/app/globals.css`; prefer an existing token or utility over a new
+  one-off style.
+- Use `next/link` for internal navigation — ESLint fails the build on raw `<a href="/…">`.
+- The home page is an async server component and fetches live prices from Dodo at build
+  time. Keep prices out of the source; if pricing copy must change, change the product
+  in Dodo.
+- Legal pages under `src/app/(legal)/` must stay consistent with the operator identity,
+  the support email, and the no-refunds-except-where-required-by-law policy already
+  stated there. Flag, do not silently change, anything that contradicts them.
 
-## Features
-
-### 1. Marketing Landing Page (`/`)
-
-The home page (`src/app/page.tsx`) is a server component that fetches pricing data and renders these sections in order:
-
-- **Navbar** — Logo, nav links, "Get Extension" CTA button
-- **HeroSection** — Headline, subtitle, social proof, ambient blob animation, retro grid background
-- **FeaturesSection** — Bento grid showcasing 7 extension features:
-  1. Export Everything (Markdown, PDF, text, JSON/CSV)
-  2. Save & Reuse Prompts (personal library with tags)
-  3. Unified Dashboard (notebooks, prompts, activity)
-  4. Notebook Management (search and organize)
-  5. AI Chat Hub (centralizes ChatGPT, Claude, Gemini)
-  6. Audio Summaries
-  7. Source Management
-- **PricingSection** — Monthly/Yearly toggle, Free and Pro tiers, Lifetime plan
-- **FAQSection** — 10 FAQs about the extension and plans
-- **CTASection** — Final "Get Started" conversion block
-- **Footer** — Legal links, social media, disclaimer (not affiliated with Google)
-
-### 2. Checkout Flow
-
-**API Route:** `POST /api/checkout` (`src/app/api/checkout/route.ts`)
-
-- Accepts `{ plan: "pro_monthly" | "pro_yearly" }` in request body
-- Looks up the correct product ID from environment variables
-- Creates a DodoPayments checkout session
-- Returns `{ checkoutUrl: string }` — the frontend opens this as an overlay modal
-- On success, redirects to `/checkout/success`
-
-**Frontend (`CheckoutProvider.tsx`):**
-- Wraps the app with DodoPayments SDK initialization
-- `PricingSection` calls the checkout API on button click and opens the overlay
-
-### 3. Authentication Iframe (`/auth`)
-
-`src/app/auth/page.tsx` runs inside an iframe embedded in the Chrome extension.
-
-**Purpose:** Handles sign-in/sign-out and sends the authenticated user's data back to the extension via `postMessage`.
-
-**Supported auth providers:**
-- Google (with `drive.file` and `drive.appdata` OAuth scopes)
-- Facebook
-- GitHub
-
-**Sign-in flow:**
-1. User clicks a social login button in the extension
-2. Extension opens the `/auth` page in an iframe
-3. `/auth` calls `signInWithPopup()` with the chosen provider
-4. On success, fetches the Firebase ID token and checks claims
-5. If user has an active subscription (`subscriptionStatus === 'active'`), includes the Google Drive access token
-6. Sends `{ type: 'AUTH_SUCCESS', user: { uid, email, displayName, photoURL, driveAccessToken } }` to the parent via `postMessage`
-
-**Sign-out flow:**
-1. Extension triggers sign-out via postMessage
-2. `/auth` revokes the Google OAuth access token (if present)
-3. Calls Firebase `signOut()`
-4. Sends `{ type: 'SIGN_OUT_SUCCESS' }` to the parent
-
-**Security:** The page sets `Cache-Control: no-store` and only allows `chrome-extension://` and `self` origins as valid parents.
-
-### 4. Google Drive Access Gating
-
-Drive access is gated behind an active subscription:
-
-```typescript
-// src/app/auth/page.tsx
-const claims = idTokenResult.claims;
-const isSubscribed = claims.subscriptionStatus === 'active';
-const driveAccessToken = isSubscribed ? googleAccessToken : null;
-```
-
-Firebase custom claims (`subscriptionStatus`, `subscriptionPlan`, `subscriptionId`, etc.) are set server-side by a separate backend (not in this repo) after payment.
-
-### 5. Pricing Tiers
-
-| Feature | Free | Pro |
-|---|---|---|
-| Exports/month | 10 | Unlimited |
-| Saved prompts | 15 max | Unlimited |
-| Dashboard | Basic | Full + analytics |
-| AI integrations | 1 | All |
-| Audio summaries | No | Yes |
-| Drive sync | No | Yes |
-| Price | Free forever | Monthly or Yearly |
-
-Yearly plan saves ~30% (billed annually). A Lifetime plan is referenced in FAQs (one-time payment, all future features).
-
----
-
-## Environment Variables
+## Checks
 
 ```bash
-# DodoPayments
-DODO_PAYMENTS_API_KEY=sk_live_...         # Server-side API key
-DODO_PRODUCT_ID_PRO_MONTHLY=pdt_...       # Product ID for monthly plan
-DODO_PRODUCT_ID_PRO_YEARLY=pdt_...        # Product ID for yearly plan
-DODO_ENV=live_mode                         # or test_mode
-
-# Public
-NEXT_PUBLIC_APP_URL=https://yourdomain.com
-NEXT_PUBLIC_DODO_ENV=live                  # or test
+npm run lint
+npx tsc --noEmit
+npm run build   # needs Dodo test-mode credentials — prerendering calls the API
 ```
 
-Firebase credentials are hardcoded in `src/lib/firebase.ts` — this is intentional because they are public client-side config (Firebase project: `notehublm-a2490`).
+## This repository is public
 
----
-
-## Key Architectural Decisions
-
-**Iframe auth for extension:** The Chrome extension cannot run Firebase auth directly due to CSP restrictions. Instead, the website hosts `/auth` as an iframe, which handles all auth flows and communicates results back via `postMessage`.
-
-**No server-side database:** The website is stateless. User data and subscription state live in Firebase (managed by a separate backend service). The website only reads Firebase auth state client-side.
-
-**Drive access token gating:** The token is only passed to the extension when `subscriptionStatus === 'active'`. This check happens on the website, not the extension, so it can't be bypassed client-side.
-
-**Pricing fetched server-side:** `page.tsx` is an async server component that calls `getPrices()` to fetch current pricing from DodoPayments before rendering. This keeps prices accurate without client-side fetching.
-
-**DodoPayments overlay mode:** Checkout opens as a modal overlay on the same page (not a redirect), which reduces drop-off. The `CheckoutProvider` initializes the SDK globally.
-
----
-
-## External Services
-
-| Service | Purpose | Config location |
-|---|---|---|
-| Firebase | User authentication, custom claims | `src/lib/firebase.ts` |
-| DodoPayments | Subscription checkout | `src/lib/dodo.ts`, env vars |
-| Google Drive API | Cloud sync for Pro users | Requested during Google sign-in |
-| Google Fonts | Plus Jakarta Sans | `src/app/layout.tsx` |
-
----
-
-## Design System
-
-- **Theme:** Dark mode with blue/purple accents
-- **Glass effects:** `.glass`, `.glass-card` utility classes in `globals.css`
-- **Animations:** Ambient blob animations, smooth hover transitions, `animate-in`
-- **Background:** Retro grid with perspective, gradient overlays
-- **Gradient text:** `.gradient-text` utility class
-- **Glow effects:** `.glow`, `.glow-text` classes
-- **Breakpoints:** Mobile-first, standard Tailwind breakpoints
-
----
-
-## What This Repo Does NOT Contain
-
-- The Chrome extension code itself
-- The backend that sets Firebase custom claims after payment
-- Database migrations or ORM models
-- Admin dashboard
-- Email templates or notification logic
+Assume everything committed here is world-readable. Before adding a file, ask whether it
+contains a credential, an internal URL, a customer identifier, or a machine-specific
+path. See [SECURITY.md](./SECURITY.md).
