@@ -10,10 +10,10 @@ export default function Footer() {
           <Wordmark size={17} />
         </div>
         <div className="links">
-          <a href="/#tools">Tools</a>
-          <a href="/#dashboard">Dashboard</a>
-          <a href="/#pricing">Pricing</a>
-          <a href="/#install">Install</a>
+          <Link href="/#tools">Tools</Link>
+          <Link href="/#dashboard">Dashboard</Link>
+          <Link href="/#pricing">Pricing</Link>
+          <Link href="/#install">Install</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
           <Link href="/refunds">Refunds</Link>

@@ -24,14 +24,20 @@
 .DS_Store
 *.pem
 
+# editors / local tooling (machine-specific, never commit)
+.idea/
+.vscode/
+.claude/settings.local.json
+
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files — real values never get committed, the template does
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -40,4 +46,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-certificates
+# locally generated HTTPS dev certs (`npm run dev:https`)
+certificates/
